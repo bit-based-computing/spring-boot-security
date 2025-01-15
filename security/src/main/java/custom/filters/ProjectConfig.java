@@ -1,19 +1,23 @@
-package basic.auth;
+package custom.filters;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 public class ProjectConfig {
+
+    @Autowired
+    private StaticKeyAuthenticationFilter staticKeyAuthenticationFilter;
 
     @Bean
     UserDetailsService userDetailsService() {
@@ -30,14 +34,15 @@ public class ProjectConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.httpBasic(Customizer.withDefaults());
-        http.authorizeHttpRequests(authorizeRequests -> {
-            authorizeRequests.anyRequest().authenticated();
-        });
+        // Adding custom filter before and after a spring boot provided filter
+//        http.addFilterBefore(new RequestValidationFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new AuthenticationLoggingFilter(), BasicAuthenticationFilter.class)
+//                .authorizeHttpRequests(c->c.anyRequest().permitAll());
 
- //       another way to set userDetailService bean
-//        http.userDetailsService(userDetailsService());
-
+        // Replacing a spring security provided filter
+        http.addFilterAt(staticKeyAuthenticationFilter,
+                BasicAuthenticationFilter.class)
+                .authorizeHttpRequests(c->c.anyRequest().permitAll());
         return http.build();
     }
 

@@ -7,7 +7,9 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 
 // basic auth
-@ComponentScan(basePackages = {"basic.auth"})
+//@ComponentScan(basePackages = {"basic.auth"})
+//@ComponentScan(basePackages = {"custom.filters"})
+@ComponentScan(basePackages = {"custom.authentication.provider"})
 @ComponentScan(basePackages = {"org.foysal.security"})
 
 public class SecurityApplication {
